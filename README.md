@@ -1,20 +1,22 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# CarePoint Health Frontend
 
-# Run and deploy your AI Studio app
+A clean Next.js 15 frontend for the CarePoint Health AI booking project.
 
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/ae40f304-d07b-424d-95cc-2e3ff415cb1c
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
+## Local setup
 
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+   ```bash
+   npm install
+   ```
+2. Copy `.env.example` to `.env.local` and set any required environment variables.
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+## Available scripts
+
+- `npm run dev` - start the app locally
+- `npm run build` - build for production
+- `npm run start` - run the production build
+- `npm run lint` - run Next.js lint
