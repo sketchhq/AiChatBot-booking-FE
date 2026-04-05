@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { 
   LayoutDashboard, 
@@ -11,9 +13,9 @@ import {
   Stethoscope
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { cn } from '../lib/utils';
-import { useAuthStore } from '../store/useAuthStore';
-import { logout } from '../firebase';
+import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/store/useAuthStore';
+import { logout } from '@/firebase';
 
 interface LayoutProps {
   children: React.ReactNode;

@@ -1,9 +1,11 @@
+'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Loader2, Paperclip, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
-import { useChatStore } from '../store/useChatStore';
-import { cn } from '../lib/utils';
+import { useChatStore } from '@/store/useChatStore';
+import { cn } from '@/lib/utils';
 import { GoogleGenAI } from "@google/genai";
 
 export default function Chat() {

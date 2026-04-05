@@ -10,7 +10,7 @@ import {
   Plus
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { cn } from '../lib/utils';
+import { cn } from '@/lib/utils';
 
 const appointments = [
   { id: '1', doctor: 'Dr. Sarah Wilson', specialization: 'Cardiologist', date: 'Oct 24, 2023', time: '10:00 AM', status: 'Upcoming', type: 'In-person' },

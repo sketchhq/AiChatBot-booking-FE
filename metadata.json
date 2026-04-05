@@ -1,5 +1,0 @@
-{
-  "name": "HealAI - Intelligent Healthcare Platform",
-  "description": "An AI-powered healthcare chatbot for symptom checking, appointment booking, and medical knowledge management.",
-  "requestFramePermissions": ["camera", "microphone", "geolocation"]
-}
