@@ -8,7 +8,7 @@ import Appointments from '@/components/Appointments';
 import Doctors from '@/components/Doctors';
 import Auth from '@/components/Auth';
 import { useAuthStore } from '@/store/useAuthStore';
-import { auth, db, loginWithGoogle } from '@/firebase';
+import { auth, db, loginWithGoogle, isFirebaseConfigured } from '@/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { UserProfile } from '@/types';
@@ -18,24 +18,45 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   useEffect(() => {
+    // If Firebase is not configured, use a mock user for local development
+    if (!isFirebaseConfigured) {
+      const mockUser: UserProfile = {
+        uid: 'local-test-user',
+        email: 'test@local.dev',
+        displayName: 'Local Test User',
+        role: 'patient',
+        photoURL: undefined,
+        createdAt: Date.now(),
+      };
+      setUser(mockUser);
+      setLoading(false);
+      console.log('Using mock user for local development (Firebase not configured)');
+      return;
+    }
+
+    // Otherwise, use Firebase auth
+    if (!auth) return;
+    
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-          if (userDoc.exists()) {
-            setUser(userDoc.data() as UserProfile);
-          } else {
-            // Create new user profile if it doesn't exist
-            const newUser: UserProfile = {
-              uid: firebaseUser.uid,
-              email: firebaseUser.email || '',
-              displayName: firebaseUser.displayName || 'User',
-              role: 'patient', // Default role
-              photoURL: firebaseUser.photoURL || undefined,
-              createdAt: Date.now(),
-            };
-            await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
-            setUser(newUser);
+          if (db) {
+            const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+            if (userDoc.exists()) {
+              setUser(userDoc.data() as UserProfile);
+            } else {
+              // Create new user profile if it doesn't exist
+              const newUser: UserProfile = {
+                uid: firebaseUser.uid,
+                email: firebaseUser.email || '',
+                displayName: firebaseUser.displayName || 'User',
+                role: 'patient', // Default role
+                photoURL: firebaseUser.photoURL || undefined,
+                createdAt: Date.now(),
+              };
+              await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
+              setUser(newUser);
+            }
           }
         } catch (error) {
           console.error("Error fetching user profile:", error);

@@ -1,12 +1,15 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Stethoscope, ShieldCheck, HeartPulse, Activity } from 'lucide-react';
+import { Stethoscope, ShieldCheck, HeartPulse, Activity, Play } from 'lucide-react';
+import { isFirebaseConfigured } from '@/firebase';
 
 interface AuthProps {
   onLogin: () => void;
 }
 
 export default function Auth({ onLogin }: AuthProps) {
+  const isLocalMode = !isFirebaseConfigured;
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* Decorative Background Elements */}
@@ -51,14 +54,30 @@ export default function Auth({ onLogin }: AuthProps) {
 
           <button 
             onClick={onLogin}
-            className="w-full py-4 bg-blue-600 text-white rounded-2xl font-semibold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-3 group"
+            className={`w-full py-4 rounded-2xl font-semibold transition-all shadow-lg flex items-center justify-center gap-3 group ${
+              isLocalMode 
+                ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-200' 
+                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200'
+            }`}
           >
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-6 h-6 bg-white rounded-full p-1" />
-            Sign in with Google
+            {isLocalMode ? (
+              <>
+                <Play size={20} />
+                Start Demo
+              </>
+            ) : (
+              <>
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-6 h-6 bg-white rounded-full p-1" />
+                Sign in with Google
+              </>
+            )}
           </button>
 
           <p className="text-xs text-slate-400 max-w-[280px]">
-            By signing in, you agree to our Terms of Service and Privacy Policy.
+            {isLocalMode 
+              ? "Running in local demo mode. No authentication required."
+              : "By signing in, you agree to our Terms of Service and Privacy Policy."
+            }
           </p>
         </div>
       </motion.div>

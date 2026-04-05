@@ -22,6 +22,9 @@ import {
   FirestoreError
 } from 'firebase/firestore';
 
+// Check if Firebase is configured
+const isFirebaseConfigured = !!(process.env.NEXT_PUBLIC_FIREBASE_API_KEY && process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
+
 // Initialize Firebase with environment variables
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
@@ -33,10 +36,21 @@ const firebaseConfig = {
   firestoreDatabaseId: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID,
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId || undefined);
+// Initialize Firebase (only if configured)
+let app: any = null;
+let auth: any = null;
+let db: any = null;
+
+if (isFirebaseConfigured) {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app, firebaseConfig.firestoreDatabaseId || undefined);
+  console.log('Firebase initialized successfully');
+} else {
+  console.warn('Firebase is not configured. Running in local-only mode without authentication.');
+}
+
+export { auth, db, isFirebaseConfigured };
 
 // Error Handling Spec for Firestore
 export enum OperationType {
@@ -90,8 +104,9 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
-// Test Connection
+// Test Connection (only if Firebase is configured)
 async function testConnection() {
+  if (!isFirebaseConfigured || !db) return;
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));
   } catch (error) {
@@ -100,12 +115,19 @@ async function testConnection() {
     }
   }
 }
-testConnection();
+
+if (isFirebaseConfigured) {
+  testConnection();
+}
 
 // Auth Helpers
 const googleProvider = new GoogleAuthProvider();
 
 export const loginWithGoogle = async () => {
+  if (!isFirebaseConfigured || !auth) {
+    console.warn('Firebase not configured. Skipping login.');
+    return { uid: 'local-test-user', email: 'test@local.dev' }; // Return mock user
+  }
   try {
     const result = await signInWithPopup(auth, googleProvider);
     return result.user;
@@ -115,4 +137,9 @@ export const loginWithGoogle = async () => {
   }
 };
 
-export const logout = () => signOut(auth);
+export const logout = () => {
+  if (auth && isFirebaseConfigured) {
+    return signOut(auth);
+  }
+  return Promise.resolve();
+};
